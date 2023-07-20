@@ -83,6 +83,28 @@ class BancoApplicationTests {
 				.andExpect(MockMvcResultMatchers.content().string(jsonString));
 	}
 
+	@Test
+	public void testGetTransferenciasComFiltros() throws Exception {
+		int headerConta = 1;
+		String nomeConta = "Fulano";
+		Conta conta = new Conta(headerConta, nomeConta);
+		List<Transferencia> transferencias = getListaTransferencias(conta);
+		
+		String dataInicio = "2019-01-01";
+		String dataFim = "2020-10-10";
+
+		Mockito.when(transferenciaService.getTransferenciasComFiltro(Mockito.any(Transferencia.class),
+				Mockito.eq(dataInicio), Mockito.eq(dataFim)))
+				.thenReturn(transferencias);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/transferencia/")
+				.param("dataInicio", dataInicio)
+				.param("dataFim", dataFim)
+				.header("conta", String.valueOf(headerConta)))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string(jsonString));
+	}
+
 	private List<Transferencia> getListaTransferencias(Conta conta) {
 		List<Transferencia> listaRetorno = new ArrayList<Transferencia>();
 		listaRetorno.add(new Transferencia(1, LocalDateTime.of(2020, 6, 8, 4, 15, 1, 0),
